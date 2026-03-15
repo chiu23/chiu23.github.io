@@ -2,430 +2,366 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CHI CHI KA KAWA 東京之旅 🌸</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>29/3-3/4 2026東京次旅</title>
     <style>
         /* --- 全局樣式 & 字體 --- */
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
         
         :root {
-            --primary-color: #ff8c94; /* 櫻花粉 */
-            --secondary-color: #a1c4fd; /* 天空藍 */
-            --text-color: #333;
-            --bg-color: #fef9f9;
-            --card-bg: #ffffff;
-            --border-color: #eee;
-            --chiikawa-bg: #fff0f5;
+            --sakura-pink: #FFB7C5;
+            --sky-blue: #a1c4fd;
+            --fuji-blue: #5B86E5;
+            --fuji-white: #FFFFFF;
+            --text-color: #3d3d3d;
+            --light-text: #6c757d;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --border-color: #e9ecef;
+            --shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
         }
 
         body {
             font-family: 'Noto Sans TC', sans-serif;
             margin: 0;
             padding: 0 0 80px 0; /* 底部留出導航欄空間 */
-            background-color: var(--bg-color);
+            background-color: #fdf6f8;
             color: var(--text-color);
+            overflow-x: hidden; /* 隱藏水平滾動條 */
+        }
+        
+        /* --- 動態櫻花背景 --- */
+        .sakura-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            pointer-events: none;
+        }
+        .sakura {
+            position: absolute;
+            list-style: none;
+            top: -50px;
+            background: var(--sakura-pink);
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0); }
+            100% { transform: translateY(100vh) rotate(720deg); }
+        }
+        
+        /* --- 頂部 Header --- */
+        .main-header {
+            background: linear-gradient(180deg, var(--sky-blue) 0%, #e3eeff 70%);
+            padding: 40px 20px 80px 20px;
+            text-align: center;
+            position: relative;
+            color: white;
+            overflow: hidden;
+        }
+        .main-header h1 {
+            font-size: 1.8em;
+            font-weight: 700;
+            margin: 0;
+            z-index: 2;
+            position: relative;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        /* CSS 繪製富士山 */
+        .fuji {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 100px;
+            background: var(--fuji-blue);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            z-index: 1;
+        }
+        .fuji::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 40px;
+            background: var(--fuji-white);
+            clip-path: polygon(50% 0%, 20% 100%, 80% 100%);
         }
 
-        /* --- 頁面容器 --- */
+
+        /* --- 頁面與卡片 --- */
+        .page-container {
+            margin-top: -60px; /* 讓卡片疊在 Header 上 */
+            position: relative;
+            z-index: 2;
+        }
         .page {
             display: none;
-            padding: 20px;
+            padding: 15px;
         }
         .page.active {
             display: block;
         }
-
-        /* --- 標題與卡片樣式 --- */
-        h1, h2, h3 {
-            color: var(--primary-color);
-            border-bottom: 2px solid var(--secondary-color);
-            padding-bottom: 5px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .day-card {
+        .card {
             background: var(--card-bg);
-            border-radius: 15px;
-            padding: 15px 20px;
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
             margin-bottom: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
+        h2 {
+            font-size: 1.6em;
+            margin: 0 0 20px 0;
+            color: var(--fuji-blue);
+            font-weight: 700;
+        }
+        h2 span { font-size: 0.6em; color: var(--light-text); margin-left: 8px; }
 
-        .day-title {
-            font-size: 1.8em;
-            margin-bottom: 15px;
-        }
-        
-        .day-title span {
-            font-size: 0.6em;
-            color: #aaa;
-            margin-left: 10px;
-        }
-
-        /* --- 時間軸樣式 --- */
-        .timeline {
-            list-style: none;
-            padding: 0;
-            position: relative;
-        }
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 5px;
-            top: 0;
-            bottom: 0;
-            width: 2px;
-            background-color: var(--secondary-color);
-            opacity: 0.5;
-        }
-
+        /* --- 時間軸 Timeline --- */
+        .timeline { list-style: none; padding: 0; }
         .timeline-item {
             display: flex;
-            margin-bottom: 20px;
             position: relative;
-            padding-left: 30px;
+            padding-left: 45px;
+            margin-bottom: 25px;
         }
-        
-        .timeline-item::before {
+        .timeline-item::before { /* 圖標背景 */
             content: '';
             position: absolute;
-            left: -2px;
-            top: 5px;
-            width: 15px;
-            height: 15px;
+            left: 0;
+            top: 0;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
-            background-color: var(--primary-color);
-            border: 3px solid var(--bg-color);
+            background: var(--sky-blue);
         }
-
+        .timeline-item::after { /* 圖標 Emoji */
+            content: attr(data-icon);
+            position: absolute;
+            left: 7px;
+            top: 1px;
+            font-size: 16px;
+        }
         .timeline-time {
-            flex-shrink: 0;
-            width: 70px;
-            font-weight: bold;
-            color: var(--primary-color);
-            margin-right: 10px;
+            position: absolute;
+            left: 0;
+            top: 35px;
+            width: 35px;
+            text-align: center;
+            font-size: 0.8em;
+            color: var(--light-text);
         }
-
-        .timeline-content {
-            flex-grow: 1;
-        }
-
-        .timeline-content p {
-            margin: 0 0 8px 0;
-            line-height: 1.6;
-        }
-
-        .timeline-content .details {
-            font-size: 0.9em;
-            color: #777;
-        }
-        
-        .timeline-content strong {
-            font-size: 1.1em;
-            color: #333;
-        }
-        
-        .optional {
-            color: #999;
-            font-style: italic;
-        }
-
-        /* --- Google Map 按鈕 --- */
+        .timeline-content p { margin: 0 0 5px 0; font-size: 1.05em; font-weight: 500; }
+        .timeline-content .details { font-size: 0.9em; color: var(--light-text); font-weight: 400; }
         .map-btn {
-            display: inline-block;
-            background-color: var(--secondary-color);
+            background: linear-gradient(45deg, var(--sky-blue), var(--fuji-blue));
             color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
+            padding: 6px 14px;
+            border-radius: 30px;
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.9em;
+            font-size: 0.85em;
             margin-top: 8px;
-            transition: background-color 0.3s;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(91, 134, 229, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
+        .map-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(91, 134, 229, 0.5); }
 
-        .map-btn:hover {
-            background-color: #8ab0e2;
-        }
-
-        /* --- 底部導航欄 --- */
+        /* --- 底部導航 --- */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
             display: flex;
-            justify-content: space-around;
-            background-color: #fff;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 -2px 15px rgba(0,0,0,0.08);
             z-index: 1000;
-            border-top: 1px solid var(--border-color);
+            padding-bottom: env(safe-area-inset-bottom); /* For iPhone X */
         }
-
         .nav-item {
-            flex-grow: 1;
-            text-align: center;
-            padding: 10px 0;
-            text-decoration: none;
-            color: #aaa;
-            transition: color 0.3s, background-color 0.3s;
-            cursor: pointer;
+            flex-grow: 1; text-align: center; padding: 12px 0; text-decoration: none;
+            color: var(--light-text); transition: color 0.3s; cursor: pointer;
         }
-        
-        .nav-item .icon {
-            font-size: 1.5em;
-            margin-bottom: 2px;
-        }
-        
-        .nav-item .label {
-            display: block;
-            font-size: 0.7em;
-        }
-
-        .nav-item.active {
-            color: var(--primary-color);
-            background-color: var(--chiikawa-bg);
-        }
-
-        /* --- Chiikawa 裝飾 --- */
-        .chiikawa {
-            width: 40px;
-            height: 40px;
-            margin-left: 10px;
-            vertical-align: middle;
-        }
-        .chiikawa-header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .chiikawa-header img {
-            width: 100px;
-        }
+        .nav-item .icon { font-size: 1.6em; }
+        .nav-item .label { display: block; font-size: 0.7em; margin-top: -2px; }
+        .nav-item.active { color: var(--fuji-blue); font-weight: 700; }
 
     </style>
 </head>
 <body>
 
-    <!-- 頁面內容 -->
-    <div id="page-itinerary" class="page active">
-        <div class="chiikawa-header">
-            <img src="https://chiikawa-info.jp/images/chiikawa.png" alt="Chiikawa">
-        </div>
-        <h1>🌸 東京行程總覽</h1>
+    <!-- 動態櫻花 -->
+    <div class="sakura-container"></div>
 
-        <!-- DAY 1 -->
-        <div class="day-card">
-            <h2 class="day-title">DAY 1 <span>29/3 (日) - 上野公園</span></h2>
-            <ul class="timeline">
-                <li class="timeline-item">
-                    <div class="timeline-time">02:00</div>
-                    <div class="timeline-content"><p><strong>出發</strong><span class="details">香港機場(GK28) → 東京成田機場</span></p></div>
-                </li>
-                <li class="timeline-item">
-                    <div class="timeline-time">08:00</div>
-                    <div class="timeline-content"><p><strong>抵達 & 交通</strong><span class="details">Skyliner 前往京成上野</span></p></div>
-                </li>
-                <li class="timeline-item">
-                    <div class="timeline-time">09:00</div>
-                    <div class="timeline-content"><p><strong>寄存行李</strong><span class="details">上野站大型儲物櫃</span></p></div>
-                </li>
-                 <li class="timeline-item">
-                    <div class="timeline-time">09:10</div>
-                    <div class="timeline-content"><p><strong>賞櫻</strong><span class="details">上野公園</span><a href="https://maps.app.goo.gl/8YcHvSHqnAvNpoKd6" target="_blank" class="map-btn">📍 地圖</a></p></div>
-                </li>
-                <li class="timeline-item">
-                    <div class="timeline-time">10:20</div>
-                    <div class="timeline-content"><p><strong>配眼鏡</strong><span class="details">JINS 艾妥列上野店</span><a href="https://maps.app.goo.gl/N6KnzVN7buRFqzXcA" target="_blank" class="map-btn">📍 地圖</a></p></div>
-                </li>
-                <li class="timeline-item">
-                    <div class="timeline-time">11:00</div>
-                    <div class="timeline-content"><p><strong>午餐</strong><span class="details">人形町今半 上野廣小路店</span><a href="https://maps.app.goo.gl/fxPXrsUqEu5yWjHE8" target="_blank" class="map-btn">📍 地圖</a></p></div>
-                </li>
-                <li class="timeline-item">
-                    <div class="timeline-time">13:00</div>
-                    <div class="timeline-content"><p><strong>購物</strong><span class="details">二木菓子, OS Drug, 扭蛋</span><a href="https://maps.app.goo.gl/h7cgxmZNcVUSKFaf8" target="_blank" class="map-btn">📍 扭蛋店</a></p></div>
-                </li>
-                <li class="timeline-item">
-                    <div class="timeline-time">15:00</div>
-                    <div class="timeline-content"><p><strong>返回酒店</strong><span class="details">上野站取行李 → 9STAY菊川</span></p></div>
-                </li>
-                <li class="timeline-item">
-                    <div class="timeline-time">17:00</div>
-                    <div class="timeline-content"><p><strong>晚餐 @ 錦糸町</strong><span class="details">客美多咖啡</span><a href="https://maps.app.goo.gl/zuQiPaVzCb9Y3hss9" target="_blank" class="map-btn">📍 地圖</a></p></div>
-                </li>
-            </ul>
+    <!-- 頂部 Header -->
+    <header class="main-header">
+        <h1>29/3-3/4 2026東京次旅</h1>
+        <div class="fuji"></div>
+    </header>
+
+    <main class="page-container">
+        <!-- 行程頁面 -->
+        <div id="page-itinerary" class="page active">
+            <!-- DAY 1 -->
+            <div class="card">
+                <h2>DAY 1 <span>29/3 (日) - 上野巡禮</span></h2>
+                <ul class="timeline">
+                    <li class="timeline-item" data-icon="✈️"><div class="timeline-time">07:10</div><div class="timeline-content"><p>抵達成田機場</p><span class="details">GK28 / T3 → T2</span></div></li>
+                    <li class="timeline-item" data-icon="🚆"><div class="timeline-time">08:00</div><div class="timeline-content"><p>Skyliner 前往上野</p></div></li>
+                    <li class="timeline-item" data-icon="🧳"><div class="timeline-time">09:00</div><div class="timeline-content"><p>上野站寄存行李</p></div></li>
+                    <li class="timeline-item" data-icon="🌸"><div class="timeline-time">09:10</div><div class="timeline-content"><p>上野公園賞櫻</p><a href="https://maps.app.goo.gl/8YcHvSHqnAvNpoKd6" target="_blank" class="map-btn">📍 地圖</a></div></li>
+                    <li class="timeline-item" data-icon="👓"><div class="timeline-time">10:20</div><div class="timeline-content"><p>JINS 配眼鏡</p><a href="https://maps.app.goo.gl/N6KnzVN7buRFqzXcA" target="_blank" class="map-btn">📍 地圖</a></div></li>
+                    <li class="timeline-item" data-icon="🍽️"><div class="timeline-time">11:00</div><div class="timeline-content"><p>午餐：人形町今半</p><span class="details">壽喜燒名店，可能需排隊</span><a href="https://maps.app.goo.gl/fxPXrsUqEu5yWjHE8" target="_blank" class="map-btn">📍 地圖</a></div></li>
+                    <li class="timeline-item" data-icon="🛍️"><div class="timeline-time">13:00</div><div class="timeline-content"><p>上野購物</p><span class="details">二木菓子, OS Drug, 扭蛋</span></div></li>
+                    <li class="timeline-item" data-icon="🏨"><div class="timeline-time">15:15</div><div class="timeline-content"><p>Check-in：9STAY菊川</p></div></li>
+                    <li class="timeline-item" data-icon="☕"><div class="timeline-time">17:00</div><div class="timeline-content"><p>晚餐：客美多咖啡</p><span class="details">錦糸町</span><a href="https://maps.app.goo.gl/zuQiPaVzCb9Y3hss9" target="_blank" class="map-btn">📍 地圖</a></div></li>
+                </ul>
+            </div>
+            <!-- DAY 2 -->
+            <div class="card">
+                <h2>DAY 2 <span>30/3 (一) - 晴空塔 & 銀座</span></h2>
+                <ul class="timeline">
+                    <li class="timeline-item" data-icon="🗼"><div class="timeline-time">10:00</div><div class="timeline-content"><p>東京晴空塔</p><span class="details">含 Pokemon Center</span><a href="https://maps.app.goo.gl/AaaAiEKV7N8SD7T19" target="_blank" class="map-btn">📍 地圖</a></div></li>
+                    <li class="timeline-item" data-icon="🍽️"><div class="timeline-time">11:00</div><div class="timeline-content"><p>午餐：名古屋備長</p><span class="details">鰻魚飯 (已預約)</span><a href="https://maps.app.goo.gl/PeuE11HGY6eL4szu5" target="_blank" class="map-btn">📍 地圖</a></div></li>
+                    <li class="timeline-item" data-icon="🌸"><div class="timeline-time">12:15</div><div class="timeline-content"><p>隅田公園 & 淺草</p><span class="details">賞櫻、吃團子</span></div></li>
+                    <li class="timeline-item" data-icon="🤖"><div class="timeline-time">13:30</div><div class="timeline-content"><p>秋葉原探險</p><span class="details">電器街、動漫周邊</span></div></li>
+                    <li class="timeline-item" data-icon="🍣"><div class="timeline-time">17:00</div><div class="timeline-content"><p>根室花丸壽司取票</p><span class="details">銀座店</span><a href="https://maps.app.goo.gl/DDod9cBS7WRLAs1h7" target="_blank" class="map-btn">📍 地圖</a></div></li>
+                    <li class="timeline-item" data-icon="🛍️"><div class="timeline-time">17:00</div><div class="timeline-content"><p>銀座購物</p><span class="details">含 Blue Bottle Coffee</span></div></li>
+                    <li class="timeline-item" data-icon="🍽️"><div class="timeline-time">19:30</div><div class="timeline-content"><p>晚餐：根室花丸壽司</p></div></li>
+                </ul>
+            </div>
+            <!-- DAY 3 -->
+            <div class="card">
+                <h2>DAY 3 <span>31/3 (二) - 富士山河口湖</span></h2>
+                <ul class="timeline">
+                    <li class="timeline-item" data-icon="🚌"><div class="timeline-time">09:15</div><div class="timeline-content"><p>高速巴士前往河口湖</p></div></li>
+                    <li class="timeline-item" data-icon="🍽️"><div class="timeline-time">11:00</div><div class="timeline-content"><p>午餐：ほうとう不動</p><span class="details">鄉土料理餺飥麵</span><a href="https://maps.app.goo.gl/3enw5DzuHYoTiM236" target="_blank" class="map-btn">📍 地圖</a></div></li>
+                    <li class="timeline-item" data-icon="🍮"><div class="timeline-time">午後</div><div class="timeline-content"><p>購買富士山布甸/麵包</p></div></li>
+                    <li class="timeline-item" data-icon="🏨"><div class="timeline-time">15:00</div><div class="timeline-content"><p>Check-in：La Vista 富士河口湖</p><span class="details">享受迎賓下午茶</span><a href="https://maps.app.goo.gl/QMaoMZbCgEq32Rxt5" target="_blank" class="map-btn">📍 地圖</a></div></li>
+                    <li class="timeline-item" data-icon="🌸"><div class="timeline-time">傍晚</div><div class="timeline-content"><p>河口湖北岸散步</p><span class="details">欣賞櫻花祭</span></div></li>
+                    <li class="timeline-item" data-icon="🍜"><div class="timeline-time">22:30</div><div class="timeline-content"><p>宵夜：酒店免費拉麵</p></div></li>
+                </ul>
+            </div>
+            <!-- DAY 4 -->
+            <div class="card">
+                <h2>DAY 4 <span>1/4 (三) - 富士山絕景</span></h2>
+                <ul class="timeline">
+                    <li class="timeline-item" data-icon="🗻"><div class="timeline-time">中午</div><div class="timeline-content"><p>新倉山淺間公園</p><span class="details">忠靈塔與富士山經典機位</span><a href="https://maps.app.goo.gl/zbUmWDtGDUeEL2jn6" target="_blank" class="map-btn">📍 地圖</a></div></li>
+                    <li class="timeline-item" data-icon="📸"><div class="timeline-time">下午</div><div class="timeline-content"><p>本町商店街</p><span class="details">日系復古街景</span><a href="https://maps.app.goo.gl/dKq4AgnvtEBGK8bY8" target="_blank" class="map-btn">📍 地圖</a></div></li>
+                    <li class="timeline-item" data-icon="🚌"><div class="timeline-time">17:40</div><div class="timeline-content"><p>高速巴士返回新宿</p></div></li>
+                    <li class="timeline-item" data-icon="🍽️"><div class="timeline-time">20:00</div><div class="timeline-content"><p>晚餐：新宿のけむり</p><span class="details">居酒屋 (已預約)</span><a href="https://maps.app.goo.gl/kwgQoPQYXCzBHtW98" target="_blank" class="map-btn">📍 地圖</a></div></li>
+                </ul>
+            </div>
+            <!-- DAY 5 -->
+            <div class="card">
+                <h2>DAY 5 <span>2/4 (四) - 夢幻迪士尼海洋</span></h2>
+                <ul class="timeline">
+                    <li class="timeline-item" data-icon="🚌"><div class="timeline-time">07:25</div><div class="timeline-content"><p>SKYTREE Shuttle 前往迪士尼</p></div></li>
+                    <li class="timeline-item" data-icon="🏰"><div class="timeline-time">全日</div><div class="timeline-content"><p>東京迪士尼海洋 ✨</p><span class="details">Fantasy Springs 等你探索！</span></div></li>
+                    <li class="timeline-item" data-icon="🚌"><div class="timeline-time">20:25</div><div class="timeline-content"><p>乘坐 Shuttle 返回錦糸町</p></div></li>
+                    <li class="timeline-item" data-icon="🍽️"><div class="timeline-time">晚餐</div><div class="timeline-content"><p>在錦糸町或菊川解決</p></div></li>
+                </ul>
+            </div>
+            <!-- DAY 6 -->
+            <div class="card">
+                <h2>DAY 6 <span>3/4 (五) - 滿載而歸</span></h2>
+                <ul class="timeline">
+                    <li class="timeline-item" data-icon="🍽️"><div class="timeline-time">午餐</div><div class="timeline-content"><p>利久牛舌</p><span class="details">銀座 Tokyu Plaza</span></div></li>
+                    <li class="timeline-item" data-icon="✈️"><div class="timeline-time">15:30</div><div class="timeline-content"><p>出發前往成田機場</p></div></li>
+                    <li class="timeline-item" data-icon="🛫"><div class="timeline-time">20:10</div><div class="timeline-content"><p>起飛回家 (GK27)</p></div></li>
+                    <li class="timeline-item" data-icon="🇭🇰"><div class="timeline-time">23:55</div><div class="timeline-content"><p>抵達香港</p></div></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 其他頁面... (交通/住宿等) -->
+        <div id="page-transport" class="page">
+             <div class="card">
+                <h2>🚌 交通資訊</h2>
+                <ul class="timeline">
+                    <li class="timeline-item" data-icon="✈️"><div class="timeline-content"><p><strong>Skyliner</strong><span class="details">成田機場 ↔ 上野</span></p></div></li>
+                    <li class="timeline-item" data-icon="💳"><div class="timeline-content"><p><strong>Suica / Pasmo</strong><span class="details">用於市區所有交通</span></p></div></li>
+                    <li class="timeline-item" data-icon="🚌"><div class="timeline-content"><p><strong>高速巴士</strong><span class="details">新宿 ↔ 河口湖 (需預約)</span></p></div></li>
+                    <li class="timeline-item" data-icon="🏰"><div class="timeline-content"><p><strong>SKYTREE Shuttle</strong><span class="details">錦糸町 ↔ 迪士尼海洋</span></p></div></li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="page-accommodation" class="page">
+            <div class="card">
+                <h2>🏨 住宿資訊</h2>
+                <ul class="timeline">
+                    <li class="timeline-item" data-icon="🏙️"><div class="timeline-content"><p><strong>9STAY菊川</strong><span class="details">Day 1-2, 4-5</span><a href="https://maps.app.goo.gl/zwF1K8F9R7t2LCY38" target="_blank" class="map-btn">📍 地圖</a></div></li>
+                    <li class="timeline-item" data-icon="🗻"><div class="timeline-content"><p><strong>La Vista 富士河口湖</strong><span class="details">Day 3</span><a href="https://maps.app.goo.gl/QMaoMZbCgEq32Rxt5" target="_blank" class="map-btn">📍 地圖</a></div></li>
+                </ul>
+            </div>
         </div>
         
-        <!-- DAY 2 -->
-        <div class="day-card">
-            <h2 class="day-title">DAY 2 <span>30/3 (一) - 晴空塔 & 秋葉原</span></h2>
-            <ul class="timeline">
-                <li class="timeline-item"><div class="timeline-time">09:30</div><div class="timeline-content"><p><strong>前往晴空塔</strong><span class="details">菊川 → 押上</span></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">10:00</div><div class="timeline-content"><p><strong>晴空塔</strong><span class="details">Pokemon Center</span><a href="https://maps.app.goo.gl/Nc3NE5iJ6qZRRrRAA" class="map-btn">📍 地圖</a></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">11:00</div><div class="timeline-content"><p><strong>午餐 (已預約)</strong><span class="details">名古屋備長</span><a href="https://maps.app.goo.gl/PeuE11HGY6eL4szu5" class="map-btn">📍 地圖</a></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">12:15</div><div class="timeline-content"><p><strong>隅田公園 & 淺草</strong><span class="details">賞櫻、扭蛋、團子</span><a href="https://maps.app.goo.gl/saTUzSHZZVH6vjsm9" class="map-btn">📍 扭蛋店</a></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">13:30</div><div class="timeline-content"><p><strong>秋葉原</strong><span class="details">M's, Radio會館</span><a href="https://maps.app.goo.gl/JuA7hX6ktXfXPFbm8" class="map-btn">📍 M's</a></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">17:00</div><div class="timeline-content"><p><strong>銀座</strong><span class="details">根室花丸取票 & 購物</span><a href="https://maps.app.goo.gl/DDod9cBS7WRLAs1h7" class="map-btn">📍 壽司店</a></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">19:30</div><div class="timeline-content"><p><strong>晚餐</strong><span class="details">迴轉壽司 根室花丸</span></p></div></li>
-            </ul>
+        <div id="page-luggage" class="page">
+            <div class="card">
+                <h2>🧳 行李資訊</h2>
+                 <ul class="timeline">
+                    <li class="timeline-item" data-icon="🛅"><div class="timeline-content"><p><strong>Day 1 上野站</strong><span class="details">使用大型儲物櫃寄存</span></p></div></li>
+                    <li class="timeline-item" data-icon="🛅"><div class="timeline-content"><p><strong>Day 3 河口湖站</strong><span class="details">富士観光ビル 1F 儲物櫃</span></p></div></li>
+                </ul>
+            </div>
         </div>
-
-        <!-- DAY 3 -->
-        <div class="day-card">
-            <h2 class="day-title">DAY 3 <span>31/3 (二) - 河口湖 🗻</span></h2>
-            <ul class="timeline">
-                <li class="timeline-item"><div class="timeline-time">08:00</div><div class="timeline-content"><p><strong>前往新宿</strong><span class="details">菊川 → 新宿</span></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">09:15</div><div class="timeline-content"><p><strong>高速巴士</strong><span class="details">新宿 → 河口湖站</span></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">11:00</div><div class="timeline-content"><p><strong>午餐 & 購物</strong><span class="details">ほうとう不動, LAWSON, 富士山布甸</span><a href="https://maps.app.goo.gl/3enw5DzuHYoTiM236" class="map-btn">📍 不動茶屋</a></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">14:00</div><div class="timeline-content"><p><strong>酒店 Check-in</strong><span class="details">La Vista 富士河口湖</span><a href="https://maps.app.goo.gl/QMaoMZbCgEq32Rxt5" class="map-btn">📍 酒店</a></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">15:00</div><div class="timeline-content"><p><strong>放鬆時間</strong><span class="details">下午茶, 湖邊散步, 櫻花祭</span></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">晚餐</div><div class="timeline-content"><p><strong>便利店豪食</strong></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">22:30</div><div class="timeline-content"><p><strong>宵夜</strong><span class="details">酒店免費拉麵</span></p></div></li>
-            </ul>
-        </div>
-        
-        <!-- DAY 4 -->
-        <div class="day-card">
-            <h2 class="day-title">DAY 4 <span>1/4 (三) - 富士山絕景</span></h2>
-             <ul class="timeline">
-                <li class="timeline-item"><div class="timeline-time">早餐</div><div class="timeline-content"><p><strong>酒店早餐</strong></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">11:00</div><div class="timeline-content"><p><strong>Check-out & 前往車站</strong></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">中午</div><div class="timeline-content"><p><strong>新倉山淺間公園</strong><span class="details">河口湖站 → 下吉田站</span><a href="https://maps.app.goo.gl/zbUmWDtGDUeEL2jn6" class="map-btn">📍 公園</a></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">下午</div><div class="timeline-content"><p><strong>本町商店街</strong><span class="details">午餐 & 拍照</span><a href="https://maps.app.goo.gl/dKq4AgnvtEBGK8bY8" class="map-btn">📍 商店街</a></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">17:40</div><div class="timeline-content"><p><strong>返回新宿</strong><span class="details">高速巴士</span></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">20:00</div><div class="timeline-content"><p><strong>晚餐 (已預約)</strong><span class="details">新宿のけむり</span><a href="https://maps.app.goo.gl/kwgQoPQYXCzBHtW98" class="map-btn">📍 居酒屋</a></p></div></li>
-            </ul>
-        </div>
-
-        <!-- DAY 5 -->
-        <div class="day-card">
-            <h2 class="day-title">DAY 5 <span>2/4 (四) - 迪士尼海洋</span></h2>
-            <ul class="timeline">
-                <li class="timeline-item"><div class="timeline-time">06:45</div><div class="timeline-content"><p><strong>出門</strong></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">07:25</div><div class="timeline-content"><p><strong>交通</strong><span class="details">SKYTREE Shuttle (錦糸町→迪士尼)</span></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">全日</div><div class="timeline-content"><p><strong>東京迪士尼海洋</strong><span class="details">午餐：便利店食品</span></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">20:25</div><div class="timeline-content"><p><strong>回程</strong><span class="details">SKYTREE Shuttle</span></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">晚餐</div><div class="timeline-content"><p><strong>錦糸町或菊川</strong></p></div></li>
-            </ul>
-        </div>
-
-        <!-- DAY 6 -->
-        <div class="day-card">
-            <h2 class="day-title">DAY 6 <span>3/4 (五) - 回程</span></h2>
-            <ul class="timeline">
-                <li class="timeline-item"><div class="timeline-time">上午</div><div class="timeline-content"><p><strong>早餐 & 整理</strong></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">午餐</div><div class="timeline-content"><p><strong>利久牛舌 (銀座)</strong></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">15:30</div><div class="timeline-content"><p><strong>前往機場</strong><span class="details">菊川 → 成田機場T3</span></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">17:00</div><div class="timeline-content"><p><strong>Check-in</strong></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">20:10</div><div class="timeline-content"><p><strong>起飛 (GK27)</strong></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">23:55</div><div class="timeline-content"><p><strong>抵達香港</strong></p></div></li>
-            </ul>
-        </div>
-    </div>
-
-    <div id="page-transport" class="page">
-        <h2>🚌 交通資訊</h2>
-        <div class="day-card">
-            <h3>主要交通票券</h3>
-            <ul class="timeline">
-                <li class="timeline-item"><div class="timeline-time">機場</div><div class="timeline-content"><p><strong>Skyliner</strong><span class="details">成田機場 ↔ 上野</span></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">市區</div><div class="timeline-content"><p><strong>Suica / Pasmo</strong><span class="details">用於所有 JR、地鐵、巴士</span></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">河口湖</div><div class="timeline-content"><p><strong>高速巴士</strong><span class="details">新宿 ↔ 河口湖 (需預約)</span></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">迪士尼</div><div class="timeline-content"><p><strong>SKYTREE Shuttle</strong><span class="details">錦糸町 ↔ 迪士尼海洋</span></p></div></li>
-            </ul>
-        </div>
-    </div>
-
-    <div id="page-accommodation" class="page">
-        <h2>🏨 住宿資訊</h2>
-        <div class="day-card">
-             <ul class="timeline">
-                <li class="timeline-item"><div class="timeline-time">Day 1-2, 4-5</div><div class="timeline-content"><p><strong>9STAY菊川</strong><a href="https://maps.app.goo.gl/zwF1K8F9R7t2LCY38" target="_blank" class="map-btn">📍 地圖</a></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">Day 3</div><div class="timeline-content"><p><strong>La Vista 富士河口湖</strong><a href="https://maps.app.goo.gl/QMaoMZbCgEq32Rxt5" target="_blank" class="map-btn">📍 地圖</a></p></div></li>
-            </ul>
-        </div>
-    </div>
+    </main>
     
-    <div id="page-luggage" class="page">
-        <h2>🧳 行李資訊</h2>
-         <div class="day-card">
-             <ul class="timeline">
-                <li class="timeline-item"><div class="timeline-time">Day 1</div><div class="timeline-content"><p><strong>上野站</strong><span class="details">使用大型儲物櫃寄存</span></p></div></li>
-                <li class="timeline-item"><div class="timeline-time">Day 3</div><div class="timeline-content"><p><strong>河口湖站</strong><span class="details">富士観光ビル 1F 儲物櫃</span></p></div></li>
-            </ul>
-        </div>
-    </div>
-
-    <div id="page-budget" class="page">
-        <h2>💰 預算備註</h2>
-        <div class="day-card">
-            <p>這個頁面可以讓你自己記錄開銷或預算！</p>
-            <p>(CHC 請食飯！)</p>
-            <img src="https://chiikawa-info.jp/images/usagi.png" alt="Usagi" style="width: 80px; margin-top: 10px;">
-        </div>
-    </div>
-
-
-    <!-- 底部導航欄 -->
+    <!-- 底部導航 -->
     <nav class="bottom-nav">
-        <a class="nav-item active" data-page="page-itinerary">
-            <div class="icon">✈️</div>
-            <span class="label">每日行程</span>
-        </a>
-        <a class="nav-item" data-page="page-transport">
-            <div class="icon">🚌</div>
-            <span class="label">交通</span>
-        </a>
-        <a class="nav-item" data-page="page-accommodation">
-            <div class="icon">🏨</div>
-            <span class="label">住宿</span>
-        </a>
-        <a class="nav-item" data-page="page-luggage">
-            <div class="icon">🧳</div>
-            <span class="label">行李</span>
-        </a>
-        <a class="nav-item" data-page="page-budget">
-            <div class="icon">💰</div>
-            <span class="label">預算</span>
-        </a>
+        <a class="nav-item active" data-page="page-itinerary"><div class="icon">✈️</div><span class="label">每日行程</span></a>
+        <a class="nav-item" data-page="page-transport"><div class="icon">🚌</div><span class="label">交通</span></a>
+        <a class="nav-item" data-page="page-accommodation"><div class="icon">🏨</div><span class="label">住宿</span></a>
+        <a class="nav-item" data-page="page-luggage"><div class="icon">🧳</div><span class="label">行李</span></a>
     </nav>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // --- 導航切換 ---
             const navItems = document.querySelectorAll('.nav-item');
             const pages = document.querySelectorAll('.page');
-
             function showPage(pageId) {
-                // 隱藏所有頁面
-                pages.forEach(page => {
-                    page.classList.remove('active');
-                });
-                // 顯示目標頁面
+                pages.forEach(p => p.classList.remove('active'));
                 const targetPage = document.getElementById(pageId);
-                if (targetPage) {
-                    targetPage.classList.add('active');
-                }
+                if(targetPage) targetPage.classList.add('active');
             }
-
             navItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    // 更新導航項目 active 狀態
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
                     navItems.forEach(i => i.classList.remove('active'));
                     this.classList.add('active');
-                    
-                    // 顯示對應頁面
                     const pageId = this.getAttribute('data-page');
                     showPage(pageId);
-
-                    // 點擊後滾動到頁面頂部
-                    window.scrollTo(0, 0);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 });
             });
 
-            // 預設顯示行程頁面
-            showPage('page-itinerary');
+            // --- 動態櫻花 ---
+            const sakuraContainer = document.querySelector('.sakura-container');
+            const sakuraCount = 20;
+            for (let i = 0; i < sakuraCount; i++) {
+                let flake = document.createElement('div');
+                flake.className = 'sakura';
+                flake.style.left = Math.random() * 100 + 'vw';
+                flake.style.width = Math.random() * 6 + 4 + 'px';
+                flake.style.height = flake.style.width;
+                flake.style.animationDuration = Math.random() * 5 + 8 + 's';
+                flake.style.animationDelay = Math.random() * -5 + 's';
+                sakuraContainer.appendChild(flake);
+            }
         });
     </script>
 </body>
